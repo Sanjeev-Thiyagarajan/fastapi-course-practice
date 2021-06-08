@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Response, status, HTTPException
 from typing import Optional
 from fastapi.param_functions import Body
 from random import randrange
@@ -44,9 +44,20 @@ async def create_post(post: Post):
 
 
 @app.get("/posts/{id}")
-async def get_post(id: int):
+async def get_post(id: int, response: Response):
 
     post = find_post(id)
     print(post)
-
+    if not post:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"Post with the id {id} is not available")
     return {"detail": post}
+
+
+# @app.delete("/posts/{id}")
+# async def delete_posts(id: int):
+#     for idx, p in enumerate(my_posts):
+#         print(p)
+#         if p['id'] == id:
+#             del my_posts[idx]
+#             return
