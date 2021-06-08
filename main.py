@@ -9,6 +9,12 @@ my_posts = [{"id": 1, "title": "my first post", "content": "random text"},
             {"id": 2, "title": "my second post", "content": "I like dogs"}]
 
 
+def find_post(id):
+    for p in my_posts:
+        if p['id'] == id:
+            return p
+
+
 class Post(BaseModel):
     title: str
     content: str
@@ -35,3 +41,12 @@ async def create_post(post: Post):
     my_posts.append(post_dict)
     print(my_posts)
     return {"data": post}
+
+
+@app.get("/posts/{id}")
+async def get_post(id: int):
+
+    post = find_post(id)
+    print(post)
+
+    return {"detail": post}
