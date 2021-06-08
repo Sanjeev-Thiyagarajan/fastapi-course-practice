@@ -1,3 +1,4 @@
+import enum
 from fastapi import FastAPI, Request, Response, status, HTTPException
 from typing import Optional
 from fastapi.param_functions import Body
@@ -13,6 +14,12 @@ def find_post(id):
     for p in my_posts:
         if p['id'] == id:
             return p
+
+
+def find_index_post(id):
+    for i, p in enumerate(my_posts):
+        if p['id'] == id:
+            return i
 
 
 class Post(BaseModel):
@@ -57,10 +64,16 @@ async def get_post(id: int, response: Response):
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_posts(id: int):
 
-    for idx, p in enumerate(my_posts):
-        print(p)
-        if p['id'] == id:
-            del my_posts[idx]
-            return Response(status_code=status.HTTP_204_NO_CONTENT)
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                        detail=f"post with id: {id} does not exist")
+    # for idx, p in enumerate(my_posts):
+    #     print(p)
+    #     if p['id'] == id:
+    #         del my_posts[idx]
+    #         return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+    index = find_index_post(id)
+    print(index)
+    if not index:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail=f"post with id: {id} does not exist")
+    my_posts.pop(index)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
