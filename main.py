@@ -54,10 +54,13 @@ async def get_post(id: int, response: Response):
     return {"detail": post}
 
 
-# @app.delete("/posts/{id}")
-# async def delete_posts(id: int):
-#     for idx, p in enumerate(my_posts):
-#         print(p)
-#         if p['id'] == id:
-#             del my_posts[idx]
-#             return
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_posts(id: int):
+
+    for idx, p in enumerate(my_posts):
+        print(p)
+        if p['id'] == id:
+            del my_posts[idx]
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"post with id: {id} does not exist")
