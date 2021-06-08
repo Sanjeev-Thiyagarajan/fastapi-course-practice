@@ -7,7 +7,9 @@ app = FastAPI()
 async def root():
     return {"message": "Hello World"}
 
+# lesson 2
+
 
 @app.get("/posts")
 async def getPosts():
-    return {"data": "getting postsd"}
+    return {"data": "getting posts"}
