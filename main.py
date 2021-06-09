@@ -26,6 +26,7 @@ class Post(BaseModel):
     title: str
     content: str
     rating: Optional[int] = None
+    published: bool = True
 
 
 app = FastAPI()
