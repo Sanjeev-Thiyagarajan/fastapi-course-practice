@@ -6,6 +6,11 @@ from random import randrange
 
 from pydantic import BaseModel
 
+from sqlalchemy.orm import Session
+
+from . import models, schemas
+from .database import engine, SessionLocal
+
 my_posts = [{"id": 1, "title": "my first post", "content": "random text"},
             {"id": 2, "title": "my second post", "content": "I like dogs"}]
 
@@ -14,6 +19,7 @@ def find_post(id):
     for p in my_posts:
         if p['id'] == id:
             return p
+# fjsdf
 
 
 def find_index_post(id):
@@ -31,8 +37,15 @@ class Post(BaseModel):
 
 app = FastAPI()
 
+models.Base.metadata.create_all(bind=engine)
 
-@ app.get("/")
+
+@app.post("/")
+async def my_post():
+    return {"message:" "hello"}
+
+
+@app.get("/")
 async def root():
     return {"message": "hello there"}
 
