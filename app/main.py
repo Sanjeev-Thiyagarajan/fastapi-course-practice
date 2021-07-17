@@ -1,6 +1,6 @@
 import enum
 from fastapi import FastAPI, Request, Response, status, HTTPException, Depends
-from typing import Optional
+from typing import Optional, List
 from fastapi.param_functions import Body
 from random import randrange
 
@@ -62,14 +62,14 @@ async def root():
     return {"message": "hello there"}
 
 
-@ app.get("/posts")
+@ app.get("/posts", response_model=List[schemas.Post])
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all()
     print(posts)
     return posts
 
 
-@ app.post("/posts", status_code=status.HTTP_201_CREATED, )
+@ app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
 async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     # post_dict = post.dict()
     # post_dict['id'] = randrange(0, 1000)
@@ -82,10 +82,10 @@ async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {new_post}
+    return new_post
 
 
-@app.get("/posts/{id}", )
+@app.get("/posts/{id}", response_model=schemas.Post)
 async def get_post(id: int, response: Response, db: Session = Depends(get_db)):
 
     # post = find_post(id)
