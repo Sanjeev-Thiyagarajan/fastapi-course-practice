@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class PostBase(BaseModel):
     title: str
     content: str
-    rating: Optional[int] = None
+    # rating: Optional[int] = None
     published: bool = True
 
 
