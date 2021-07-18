@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship
 
 from .database import Base
 
@@ -11,6 +12,9 @@ class Post(Base):
     title = Column(String, index=True, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean)
+    # owner_id = Column(Integer, ForeignKey("users.id"))
+
+    # owner = relationship("User", back_populates="posts")
 
 
 class User(Base):
@@ -18,3 +22,5 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String)
     password = Column(String)
+
+    # posts = relationship("Post", back_populates="owner")

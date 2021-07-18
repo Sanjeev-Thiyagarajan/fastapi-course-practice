@@ -3,14 +3,14 @@ from fastapi import FastAPI, Request, Response, status, HTTPException, Depends
 from typing import Optional, List
 from fastapi.param_functions import Body
 from random import randrange
-
+from .routers import post, user
 
 from pydantic import BaseModel
 
 from sqlalchemy.orm import Session
 
 from . import models, schemas, utils
-from .database import engine, SessionLocal
+from .database import engine, SessionLocal, get_db
 
 my_posts = [{"id": 1, "title": "my first post", "content": "random text"},
             {"id": 2, "title": "my second post", "content": "I like dogs"}]
@@ -29,14 +29,6 @@ def find_index_post(id):
             return i
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 class Post(BaseModel):
     title: str
     content: str
@@ -48,133 +40,17 @@ app = FastAPI()
 
 models.Base.metadata.create_all(bind=engine)
 
-
-@app.post("/")
-async def my_post(request: schemas.PostBase, db: Session = Depends(get_db)):
-    new_post = models.Post(title=request.title)
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return new_post
+app.include_router(post.router)
+app.include_router(user.router)
+# @app.post("/")
+# async def my_post(request: schemas.PostBase, db: Session = Depends(get_db)):
+#     new_post = models.Post(title=request.title)
+#     db.add(new_post)
+#     db.commit()
+#     db.refresh(new_post)
+#     return new_post
 
 
 @app.get("/")
 async def root():
     return {"message": "hello there"}
-
-
-@ app.get("/posts", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(get_db)):
-    posts = db.query(models.Post).all()
-    print(posts)
-    return posts
-
-
-@ app.post("/posts", status_code=status.HTTP_201_CREATED, response_model=schemas.Post)
-async def create_post(post: schemas.PostCreate, db: Session = Depends(get_db)):
-    # post_dict = post.dict()
-    # post_dict['id'] = randrange(0, 1000)
-    # my_posts.append(post_dict)
-    # print(my_posts)
-
-    # new_post = models.Post(title=post.title, content=post.content)
-    print(post.dict())
-    new_post = models.Post(**post.dict())
-    db.add(new_post)
-    db.commit()
-    db.refresh(new_post)
-    return new_post
-
-
-@app.get("/posts/{id}", response_model=schemas.Post)
-async def get_post(id: int, response: Response, db: Session = Depends(get_db)):
-
-    # post = find_post(id)
-    # print(post)
-    # if not post:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"Post with the id {id} is not available")
-
-    post = db.query(models.Post).filter(models.Post.id == id).first()
-
-    if not post:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"Post with the id {id} is not available")
-    return post
-
-
-@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_posts(id: int, db: Session = Depends(get_db)):
-
-    # for idx, p in enumerate(my_posts):
-    #     print(p)
-    #     if p['id'] == id:
-    #         del my_posts[idx]
-    #         return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-    # index = find_index_post(id)
-    # print(index)
-    # if index == None:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"post with id: {id} does not exist")
-    # my_posts.pop(index)
-
-    post = db.query(models.Post).filter(models.Post.id ==
-                                        id)
-
-    if not post.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} does not exist")
-    post.delete(synchronize_session=False)
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
-
-
-@app.put("/posts/{id}")
-async def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)):
-    # index = find_index_post(id)
-    # print(index)
-    # if index == None:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-    #                         detail=f"post with id: {id} does not exist")
-
-    # post_dict = post.dict()
-    # post_dict['id'] = id
-    # my_posts[index] = post_dict
-
-    # print(post.dict())
-    post = db.query(models.Post).filter(
-        models.Post.id == id)
-
-    if not post.first():
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"post with id: {id} does not exist")
-
-    post.update({'title': 'hello'}, synchronize_session=False)
-    print(post)
-    db.commit()
-
-    return "updated post"
-
-
-@app.post('/user', response_model=schemas.UserOut)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-
-    hashedPassword = utils.hash(user.password)
-    user.password = hashedPassword
-    new_user = models.User(**user.dict())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return new_user
-
-
-@app.get('/user/{id}', response_model=schemas.UserOut)
-def get_user(id: int, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.id == id).first()
-
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail=f"User with id: {id} does not exist")
-
-    return user
