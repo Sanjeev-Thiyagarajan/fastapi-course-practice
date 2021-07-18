@@ -11,3 +11,10 @@ class Post(Base):
     title = Column(String, index=True, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean)
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String)
+    password = Column(String)

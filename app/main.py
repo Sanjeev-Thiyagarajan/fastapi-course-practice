@@ -4,11 +4,12 @@ from typing import Optional, List
 from fastapi.param_functions import Body
 from random import randrange
 
+
 from pydantic import BaseModel
 
 from sqlalchemy.orm import Session
 
-from . import models, schemas
+from . import models, schemas, utils
 from .database import engine, SessionLocal
 
 my_posts = [{"id": 1, "title": "my first post", "content": "random text"},
@@ -154,3 +155,15 @@ async def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(g
     db.commit()
 
     return "updated post"
+
+
+@app.post('/user', response_model=schemas.UserOut)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+
+    hashedPassword = utils.hash(user.password)
+    user.password = hashedPassword
+    new_user = models.User(**user.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
