@@ -1,6 +1,7 @@
+
 from fastapi import APIRouter, Depends, status, HTTPException, Response
 from typing import List
-from .. import schemas, database, models
+from .. import schemas, database, models, oauth2
 from sqlalchemy.orm import Session
 router = APIRouter(
     prefix="/posts",
@@ -10,7 +11,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.Post])
-def get_posts(db: Session = Depends(database.get_db)):
+def get_posts(db: Session = Depends(database.get_db), get_current_User: schemas.UserLogin = Depends(oauth2.get_current_user)):
     posts = db.query(models.Post).all()
     print(posts)
     return posts
