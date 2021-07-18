@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, Response, status, HTTPException, Depends
 from typing import Optional, List
 from fastapi.param_functions import Body
 from random import randrange
-from .routers import post, user
+from .routers import post, user, auth
 
 from pydantic import BaseModel
 
@@ -42,6 +42,7 @@ models.Base.metadata.create_all(bind=engine)
 
 app.include_router(post.router)
 app.include_router(user.router)
+app.include_router(auth.router)
 # @app.post("/")
 # async def my_post(request: schemas.PostBase, db: Session = Depends(get_db)):
 #     new_post = models.Post(title=request.title)
