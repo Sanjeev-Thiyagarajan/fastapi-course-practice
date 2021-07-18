@@ -12,9 +12,9 @@ class Post(Base):
     title = Column(String, index=True, nullable=False)
     content = Column(String, nullable=False)
     published = Column(Boolean)
-    # owner_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
 
-    # owner = relationship("User", back_populates="posts")
+    owner = relationship("User")
 
 
 class User(Base):
@@ -22,5 +22,3 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String)
     password = Column(String)
-
-    # posts = relationship("Post", back_populates="owner")

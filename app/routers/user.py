@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(
     tags=["Users"],
-    prefix="/User"
+    prefix="/user"
 )
 
 

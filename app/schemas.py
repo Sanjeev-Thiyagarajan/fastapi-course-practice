@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from pydantic import BaseModel
+# from sqlalchemy.sql.sqltypes import Boolean
 
 
 class PostBase(BaseModel):
@@ -14,10 +15,19 @@ class PostCreate(PostBase):
     pass
 
 
-class Post(PostBase):
+class UserBase(BaseModel):
+    email: str
     id: int
 
     class Config:
+        orm_mode = True
+
+
+class Post(PostBase):
+    id: int
+    owner: UserBase
+
+    class Config():
         orm_mode = True
 
 
@@ -35,7 +45,7 @@ class UserOut(BaseModel):
     id: int
     email: str
 
-    class Config:
+    class Config():
         orm_mode = True
 
 
@@ -45,4 +55,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: Optional[str] = None
+    id: Optional[int] = None
