@@ -9,11 +9,13 @@ from pydantic import BaseModel
 
 from sqlalchemy.orm import Session
 
-from . import models, schemas, utils
+from . import models, schemas, utils, config
 from .database import engine, SessionLocal, get_db
 
 my_posts = [{"id": 1, "title": "my first post", "content": "random text"},
             {"id": 2, "title": "my second post", "content": "I like dogs"}]
+
+print(config.settings.database_hostname)
 
 
 def find_post(id):

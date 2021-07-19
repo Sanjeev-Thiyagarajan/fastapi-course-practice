@@ -22,3 +22,9 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String)
     password = Column(String)
+
+
+# class Vote(Base):
+#     __tablename__ = "votes"
+#     user_id = Column(Integer, ForeignKey("users.id"), primary_key=True)
+#     post_id = Column(Integer, ForeignKey("posts.id"), primary_key=True)
